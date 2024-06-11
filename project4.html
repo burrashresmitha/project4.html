@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-Do List</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+    h1 {
+        text-align: center;
+    }
+    #taskInput {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+    #taskList {
+        list-style-type: none;
+        padding: 0;
+    }
+    .task {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .delete-btn {
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .delete-btn:hover {
+        background-color: #d32f2f;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="Add New Task">
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    // Function to load tasks from local storage
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.forEach(task => addTaskToList(task));
+    }
+
+    // Function to save tasks to local storage
+    function saveTasks(tasks) {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Function to add a new task to the list
+    function addTaskToList(taskText) {
+        const taskList = document.getElementById('taskList');
+        const li = document.createElement('li');
+        li.className = 'task';
+        li.innerHTML = `
+            <span>${taskText}</span>
+            <button class="delete-btn">Delete</button>
+        `;
+        taskList.appendChild(li);
+    }
+
+    // Function to handle adding a new task
+    function addTask() {
+        const taskInput = document.getElementById('taskInput');
+        const taskText = taskInput.value.trim();
+        if (taskText !== '') {
+            addTaskToList(taskText);
+            taskInput.value = '';
+            updateTasksInLocalStorage();
+        }
+    }
+
+    // Function to handle deleting a task
+    function deleteTask(event) {
+        if (event.target.classList.contains('delete-btn')) {
+            const taskItem = event.target.parentElement;
+            taskItem.remove();
+            updateTasksInLocalStorage();
+        }
+    }
+
+    // Function to update tasks in local storage
+    function updateTasksInLocalStorage() {
+        const tasks = [];
+        document.querySelectorAll('.task span').forEach(task => tasks.push(task.textContent));
+        saveTasks(tasks);
+    }
+
+    // Event listeners
+    document.getElementById('taskInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            addTask();
+        }
+    });
+
+    document.getElementById('taskList').addEventListener('click', deleteTask);
+
+    // Load tasks when the page is loaded
+    document.addEventListener('DOMContentLoaded', loadTasks);
+</script>
+</body>
+</html>
